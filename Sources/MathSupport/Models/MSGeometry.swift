@@ -110,7 +110,15 @@ extension MSGeometry {
     ///
     /// - Parameter string: The input string.
     /// - Returns: The alignment's x-height.
-    static func parseAlignment(from string: String) -> XHeight? {}
+    static func parseAlignment(from string: String) -> XHeight? {
+        let trimmed = string.trimmingCharacters(in: CharacterSet(charactersIn: "\";"))
+        let component = trimmed.components(separatedBy: CharacterSet(charactersIn: ":"))
+        
+        guard component.count == 2 else { return nil }
+        
+        let value = component[1].trimmingCharacters(in: .whitespaces)
+        return XHeight(stringValue: value)
+    }
     
     /// Parses the x-height value from an attribute.
     ///
@@ -118,7 +126,10 @@ extension MSGeometry {
     ///
     /// - Parameter string: The input string.
     /// - Returns: The x-height.
-    static func parseXHeight(from string: String) -> XHeight? {}
+    static func parseXHeight(from string: String) -> XHeight? {
+        let trimmed = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        return XHeight(stringValue: trimmed)
+    }
     
     /// Parses the view-box from an attribute.
     ///
@@ -126,7 +137,21 @@ extension MSGeometry {
     ///
     /// - Parameter string: The input string.
     /// - Returns: The view-box.
-    static func parseViewBox(from string: String) -> CGRect? {}
+    static func parseViewBox(from string: String) -> CGRect? {
+        let trimmed = string.trimmingCharacters(in: CharacterSet(charactersIn: "\""))
+        let component = trimmed.components(separatedBy: CharacterSet.whitespaces)
+        
+        guard component.count == 4 else { return nil }
+        
+        guard let x = Double(component[0]),
+              let y = Double(component[1]),
+              let width = Double(component[2]),
+              let height = Double(component[3]) else {
+            return nil
+        }
+        
+        return CGRect(x: x, y: y, width: width, height: height)
+    }
 }
 
 extension MSGeometry.XHeight {
@@ -134,8 +159,7 @@ extension MSGeometry.XHeight {
         let trimmed = stringValue.trimmingCharacters(in: CharacterSet(charactersIn: "ex"))
         if let value = Double(trimmed) {
             self = CGFloat(value)
-        }
-        else {
+        } else {
             return nil
         }
     }
