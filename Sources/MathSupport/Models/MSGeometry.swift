@@ -1,0 +1,171 @@
+//
+// MSGeometry.swif
+// MathSupport Core
+//
+// Copyright (c) 2024 - ScribbleLabApp. All rights reserved.
+//
+// Permission is hereby granted, free of charge, to any person obtaining a copy
+// of this software and associated documentation files (the "Software"), to
+// deal in the Software without restriction, including without limitation the
+// rights to use, copy, modify, merge, publish, distribute, sublicense, and/or
+// sell copies of the Software, and to permit persons to whom the Software is
+// furnished to do so, subject to the following conditions:
+//
+// The above copyright notice and this permission notice shall be included in
+// all copies or substantial portions of the Software.
+//
+// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING
+// FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS
+// IN THE SOFTWARE.
+//
+
+import Foundation
+import SwiftUI
+
+internal struct MSGeometry: Codable, Hashable {
+    
+    /// A unit of height that defines the height of the `x` character of a font.
+    typealias XHeight = CGFloat
+    
+    /// A parsing error.
+    enum ParsingError: Error {
+        case missingSVGElement
+        case missingGeometry
+    }
+    
+    /// The SVG element regex.
+    private static let svgRegex = #/<svg.*?>/#
+    
+    /// The attribute regex.
+    private static let attributeRegex = #/\w*:*\w+=".*?"/#
+    
+    /// The SVG's vertical alignment (offset).
+    let verticalAlignment: XHeight
+    
+    /// The SVG's width.
+    let width: XHeight
+    
+    /// The SVG's height.
+    let height: XHeight
+    
+    /// The SVG's frame.
+    let frame: CGRect
+    
+    init(svg: String) throws {
+        guard let match = svg.firstMatch(of: MSGeometry.svgRegex) else {
+            throw ParsingError.missingSVGElement
+        }
+        
+        let element = String(
+            svg[
+                svg.index(
+                    after: match.range.lowerBound
+                ) ..< svg.index(
+                    before: match.range.upperBound
+                )
+            ]
+        )
+        
+        var verticalAlignment: XHeight?
+        var width: XHeight?
+        var height: XHeight?
+        var frame: CGRect?
+        
+        for match in element.matches(of: MSGeometry.attributeRegex) {
+            let attribute = String(element[match.range])
+            let components = attribute.components(separatedBy: CharacterSet(charactersIn: "="))
+            guard components.count == 2 else { continue }
+            
+            switch components[0] {
+            case "style": verticalAlignment = MSGeometry.parseAlignment(from: components[1])
+            case "width": width = MSGeometry.parseXHeight(from: components[1])
+            case "height": height = MSGeometry.parseXHeight(from: components[1])
+            case "viewBox": frame = MSGeometry.parseViewBox(from: components[1])
+            default: continue
+            }
+        }
+        
+        guard let verticalAlignment = verticalAlignment,
+              let width = width,
+              let height = height,
+              let frame = frame else {
+            throw ParsingError.missingGeometry
+        }
+        
+        self.verticalAlignment = verticalAlignment
+        self.width = width
+        self.height = height
+        self.frame = frame
+    }
+}
+
+extension MSGeometry {
+    /// Parses the alignment from the style attribute.
+    ///
+    /// "vertical-align: -1.602ex;"
+    ///
+    /// - Parameter string: The input string.
+    /// - Returns: The alignment's x-height.
+    static func parseAlignment(from string: String) -> XHeight? {}
+    
+    /// Parses the x-height value from an attribute.
+    ///
+    /// "2.127ex"
+    ///
+    /// - Parameter string: The input string.
+    /// - Returns: The x-height.
+    static func parseXHeight(from string: String) -> XHeight? {}
+    
+    /// Parses the view-box from an attribute.
+    ///
+    /// "0 -1342 940 2050"
+    ///
+    /// - Parameter string: The input string.
+    /// - Returns: The view-box.
+    static func parseViewBox(from string: String) -> CGRect? {}
+}
+
+extension MSGeometry.XHeight {
+    init?(stringValue: String) {
+        let trimmed = stringValue.trimmingCharacters(in: CharacterSet(charactersIn: "ex"))
+        if let value = Double(trimmed) {
+            self = CGFloat(value)
+        }
+        else {
+            return nil
+        }
+    }
+    
+    /// Converts the x-height to points.
+    ///
+    /// - Parameter xHeight: The height of 1 x-height unit.
+    /// - Returns: The points.
+    func toPoints(_ xHeight: CGFloat) -> CGFloat {
+        xHeight * self
+    }
+    
+    /// Converts the x-height to points.
+    ///
+    /// - Parameter font: The font.
+    /// - Returns: The points.
+    func toPoints(_ font: _Font) -> CGFloat {
+        toPoints(font.xHeight)
+    }
+    
+    /// Converts the x-height to points.
+    ///
+    /// - Parameter font: The font.
+    /// - Returns: The points.
+    func toPoints(_ font: Font) -> CGFloat {
+#if os(iOS)
+        toPoints(_Font.preferredFont(from: font))
+#else
+        toPoints(_Font.preferredFont(from: font))
+#endif
+    }
+}
+
