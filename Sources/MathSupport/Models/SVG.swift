@@ -25,6 +25,7 @@
 
 import Foundation
 
+@available(iOS 18.0, *)
 internal struct SVG: Codable, Hashable {
     
     enum svgError: Error {
@@ -65,6 +66,7 @@ internal struct SVG: Codable, Hashable {
     }
 }
 
+@available(iOS 18.0, *)
 extension SVG {
     /// The JSON encoded value of the receiver.
     ///

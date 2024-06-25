@@ -26,6 +26,7 @@
 import Foundation
 import SwiftUI
 
+@available(iOS 18.0, *)
 internal struct MSGeometry: Codable, Hashable {
     
     /// A unit of height that defines the height of the `x` character of a font.
@@ -181,15 +182,15 @@ extension MSGeometry.XHeight {
     }
     
     /// Converts the x-height to points.
-    ///
-    /// - Parameter font: The font.
-    /// - Returns: The points.
-    func toPoints(_ font: Font) -> CGFloat {
-#if os(iOS)
-        toPoints(_Font.preferredFont(from: font))
-#else
-        toPoints(_Font.preferredFont(from: font))
-#endif
-    }
+//    ///
+//    /// - Parameter font: The font.
+//    /// - Returns: The points.
+//    func toPoints(_ font: Font) -> CGFloat {
+//#if os(iOS)
+//        toPoints(_Font.preferredFont(from: font))
+//#else
+//        toPoints(_Font.preferredFont(from: font))
+//#endif
+//    }
 }
 

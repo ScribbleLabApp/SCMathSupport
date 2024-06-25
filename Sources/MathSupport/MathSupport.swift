@@ -29,6 +29,9 @@ import SwiftUI
 
 /// A view that can parse and render TeX and LaTeX equations that contain
 /// math-mode marcos.
+///
+/// @Beta
+/// - Note: This function is currently in beta
 public struct Math {
     
     /// A closure that takes an equation number and returns a string to display in
