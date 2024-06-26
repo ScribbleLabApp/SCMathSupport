@@ -181,7 +181,7 @@ extension MSGeometry.XHeight {
         toPoints(font.xHeight)
     }
     
-    /// Converts the x-height to points.
+//    /// Converts the x-height to points.
 //    ///
 //    /// - Parameter font: The font.
 //    /// - Returns: The points.

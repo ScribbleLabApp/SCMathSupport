@@ -1,7 +1,7 @@
 // The Swift Programming Language
 // https://docs.swift.org/swift-book
 //
-// MathSupport.swif
+// MathSupport.swift
 // MathSupport Core
 //
 // Copyright (c) 2024 - ScribbleLabApp. All rights reserved.
@@ -32,6 +32,7 @@ import SwiftUI
 ///
 /// @Beta
 /// - Note: This function is currently in beta
+@available(iOS 18.0, *)
 public struct Math {
     
     /// A closure that takes an equation number and returns a string to display in
