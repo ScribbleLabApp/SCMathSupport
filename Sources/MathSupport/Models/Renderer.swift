@@ -26,7 +26,7 @@
 import SwiftUI
 import SVGView
 import Foundation
-import MathJaxSwift
+//import MathJaxSwift
 
 #if os(iOS)
 import UIKit

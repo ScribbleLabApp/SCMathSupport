@@ -1,6 +1,6 @@
 //
-//  Aliases.swift
-//  MathSupport Core
+//  MonteCarloPiSimulation.swift
+//  MathSupport stdlib
 //
 //  Copyright (c) 2024 - ScribbleLabApp. All rights reserved.
 //
@@ -25,16 +25,17 @@
 
 import Foundation
 
-#if os(iOS)
-import UIKit
+public func monteCarloPiSimulation(iterations: Int) -> Double {
+    let rng = MersenneTwister(seed: UInt32(time(nil)))
+    var insideCircle = 0
 
-internal typealias _Image = UIImage
-internal typealias _Font = UIFont
-internal typealias _Color = UIColor
-#else
-import Cocoa
+    for _ in 0..<iterations {
+        let x = Double(rng.nextUInt32()) / Double(UInt32.max)
+        let y = Double(rng.nextUInt32()) / Double(UInt32.max)
+        if x * x + y * y <= 1.0 {
+            insideCircle += 1
+        }
+    }
 
-internal typealias _Image = NSImage
-internal typealias _Font = NSFont
-internal typealias _Color = NSColor
-#endif
+    return 4.0 * Double(insideCircle) / Double(iterations)
+}

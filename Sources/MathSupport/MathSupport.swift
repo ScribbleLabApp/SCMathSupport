@@ -26,7 +26,7 @@
 //
 
 import SwiftUI
-import MathJaxSwift
+//import MathJaxSwift
 //import HTMLEntities
 
 /// A view that can parse and render TeX and LaTeX equations that contain

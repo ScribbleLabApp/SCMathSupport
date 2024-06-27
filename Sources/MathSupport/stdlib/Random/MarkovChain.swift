@@ -1,6 +1,6 @@
 //
-//  Aliases.swift
-//  MathSupport Core
+//  MarkovChain.swift
+//  MathSupport stdlib
 //
 //  Copyright (c) 2024 - ScribbleLabApp. All rights reserved.
 //
@@ -25,16 +25,30 @@
 
 import Foundation
 
-#if os(iOS)
-import UIKit
+public class MarkovChain {
+    private var transitionMatrix: [[Double]]
+    private var states: [String]
+    private var currentState: Int
 
-internal typealias _Image = UIImage
-internal typealias _Font = UIFont
-internal typealias _Color = UIColor
-#else
-import Cocoa
+    public init(transitionMatrix: [[Double]], initialState: Int, states: [String]) {
+        self.transitionMatrix = transitionMatrix
+        self.currentState = initialState
+        self.states = states
+    }
 
-internal typealias _Image = NSImage
-internal typealias _Font = NSFont
-internal typealias _Color = NSColor
-#endif
+    public func nextState() -> String {
+        let rng = MersenneTwister(seed: UInt32(time(nil)))
+        let randomValue = Double(rng.nextUInt32()) / Double(UInt32.max)
+        var cumulativeProbability = 0.0
+
+        for (index, probability) in transitionMatrix[currentState].enumerated() {
+            cumulativeProbability += probability
+            if randomValue < cumulativeProbability {
+                currentState = index
+                break
+            }
+        }
+
+        return states[currentState]
+    }
+}
