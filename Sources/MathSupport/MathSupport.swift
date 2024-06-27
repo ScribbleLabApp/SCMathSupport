@@ -25,154 +25,113 @@
 // IN THE SOFTWARE.
 //
 
-import SwiftUI
-//import MathJaxSwift
-//import HTMLEntities
+import Foundation
 
-/// A view that can parse and render TeX and LaTeX equations that contain
-/// math-mode marcos.
-///
-/// @Beta
-/// - Note: This function is currently in beta
-@available(iOS 18.0, *)
-public struct Math: View {
+/// A collection of advanced mathematical functions.
+public class Math {
     
-    /// A closure that takes an equation number and returns a string to display in
-    /// the view.
-    public typealias FormatEquationNumber = (_ n: Int) -> String
-    
-    public enum BlockMode {
-        
-        /// Block equations are ignored and always rendered inline.
-        case alwaysInline
-        
-        /// Blocks are rendered as text with newlines.
-        case blockText
-        
-        /// Blocks are rendered as views.
-        case blockViews
-    }
-    
-    /// The view's equation number mode.
-    public enum EquationNumberMode {
-        
-        /// The view should not number named block equations.
-        case none
-        
-        /// The view should number named block equations on the left side.
-        case left
-        
-        /// The view should number named block equations on the right side.
-        case right
-    }
-    
-    /// The view's error mode.
-    public enum ErrorMode {
-        
-        /// The rendered image should be displayed (if available).
-        case rendered
-        
-        /// The original LaTeX input should be displayed.
-        case original
-        
-        /// The error text should be displayed.
-        case error
-    }
-    
-    /// The view's rendering mode.
-    public enum ParsingMode {
-        
-        /// Render the entire text as the equation.
-        case all
-        
-        /// Find equations in the text and only render the equations.
-        case onlyEquations
-    }
-    
-    /// The view's rendering style.
-    public enum RenderingStyle {
-        
-        /// The view remains empty until its finished rendering.
-        case empty
-        
-        /// The view displays the input text until its finished rendering.
-        case original
-        
-        /// The view displays a progress view until its finished rendering.
-        case progress
-        
-        /// The view blocks on the main thread until its finished rendering.
-        case wait
-    }
-    
-    /// The package's shared data cache.
-    public static var dataCache: NSCache<NSString, NSData> {
-        Cache.shared.dataCache
-    }
-    
-#if os(macOS)
-    /// The package's shared image cache.
-    public static var imageCache: NSCache<NSString, NSImage> {
-        Cache.shared.imageCache
-    }
-#else
-    /// The package's shared image cache.
-    public static var imageCache: NSCache<NSString, UIImage> {
-        Cache.shared.imageCache
-    }
-#endif
-    
-    /// The view's LaTeX input string.
-    public let latex: String
-    
-//    /// What to do in the case of an error.
-//    @Environment(\.errorMode) private var errorMode
-//    
-//    /// Whether or not we should unencode the input.
-//    @Environment(\.unencodeHTML) private var unencodeHTML
-//    
-//    /// Should the view parse the entire input string or only equations?
-//    @Environment(\.parsingMode) private var parsingMode
-//    
-//    /// The view's block rendering mode.
-//    @Environment(\.blockMode) private var blockMode
-//    
-//    /// Whether the view should process escapes.
-//    @Environment(\.processEscapes) private var processEscapes
-//    
-//    /// The view's rendering style.
-//    @Environment(\.renderingStyle) private var renderingStyle
-//    
-//    /// The animation the view should apply to its rendered images.
-//    @Environment(\.renderingAnimation) private var renderingAnimation
-    
-    /// The view's current display scale.
-    @Environment(\.displayScale) private var displayScale
-    
-    /// The view's font.
-    @Environment(\.font) private var font
-    
-    /// The view's renderer.
-    @StateObject private var renderer = Renderer()
-    
-    /// The view's preload task, if any.
-    @State private var preloadTask: Task<(), Never>?
-    
-    /// Initializes a view with a LaTeX input string.
+    /// Computes the Gamma function for a given value using the Lanczos approximation for the Gamma function.
     ///
-    /// - Parameter latex: The LaTeX input.
-    public init(_ latex: String) {
-        self.latex = latex
+    /// - Parameter x: The input value.
+    /// - Returns: The value of the Gamma function at `x`.
+    public static func gamma(_ x: Double) -> Double {
+        let g = 7
+        let p: [Double] = [0.99999999999980993,
+                           676.5203681218851,
+                           -1259.1392167224028,
+                           771.32342877765313,
+                           -176.61502916214059,
+                           12.507343278686905,
+                           -0.13857109526572012,
+                           9.9843695780195716e-6,
+                           1.5056327351493116e-7]
+        
+        if x < 0.5 {
+            return Double.pi / (sin(Double.pi * x) * gamma(1 - x))
+        } else {
+            var x = x - 1
+            var a = p[0]
+            let t = x + Double(g) + 0.5
+            for i in 1..<p.count {
+                a += p[i] / (x + Double(i))
+            }
+            return sqrt(2 * Double.pi) * pow(t, x + 0.5) * exp(-t) * a
+        }
     }
     
-    public var body: some View {
-        Text("")
+    /// Computes the Beta function for given values.
+    ///
+    /// - Parameters:
+    ///   - x: The first input value.
+    ///   - y: The second input value.
+    /// - Returns: The value of the Beta function at `x` and `y`.
+    public static func beta(_ x: Double, _ y: Double) -> Double {
+        return gamma(x) * gamma(y) / gamma(x + y)
     }
-}
-
-extension Math {
     
-    private func isCached() -> Bool {
-        return true
+    /// Computes the error function for a given value.
+    ///
+    /// - Parameter x: The input value.
+    /// - Returns: The value of the error function at `x`.
+    public static func erf(_ x: Double) -> Double {
+        // Using the approximation by Abramowitz and Stegun
+        let a1 = 0.254829592
+        let a2 = -0.284496736
+        let a3 = 1.421413741
+        let a4 = -1.453152027
+        let a5 = 1.061405429
+        let p = 0.3275911
+        
+        let sign = x < 0 ? -1 : 1
+        let absX = abs(x)
+        let t = 1.0 / (1.0 + p * absX)
+        let y = 1.0 - (((((a5 * t + a4) * t) + a3) * t + a2) * t + a1) * t * exp(-absX * absX)
+        
+        return Double(sign) * y
+    }
+    
+    /// Computes the Bessel function of the first kind for a given value.
+    ///
+    /// - Parameters:
+    ///   - n: The order of the Bessel function.
+    ///   - x: The input value.
+    /// - Returns: The value of the Bessel function of the first kind at `x`.
+    public static func besselJ(n: Int, x: Double) -> Double {
+        // Using a series expansion for Bessel functions
+        let m = 100
+        let sumLimit = 1e-10
+        var sum = 0.0
+        
+        for k in 0...m {
+            let term = pow(-1.0, Double(k)) * pow(x / 2, Double(2 * k + n)) / (factorial(k) * factorial(k + n))
+            if abs(term) < sumLimit { break }
+            sum += term
+        }
+        
+        return sum
+    }
+    
+    /// Computes the Legendre polynomial of a given degree.
+    ///
+    /// - Parameters:
+    ///   - n: The degree of the Legendre polynomial.
+    ///   - x: The input value.
+    /// - Returns: The value of the Legendre polynomial of degree `n` at `x`.
+    public static func legendreP(n: Int, x: Double) -> Double {
+        if n == 0 {
+            return 1.0
+        } else if n == 1 {
+            return x
+        } else {
+            return ((2.0 * Double(n) - 1.0) * x * legendreP(n: n - 1, x: x) - (Double(n) - 1.0) * legendreP(n: n - 2, x: x)) / Double(n)
+        }
+    }
+    
+    /// Computes the factorial of a given non-negative integer.
+    ///
+    /// - Parameter n: The input integer.
+    /// - Returns: The factorial of `n`.
+    private static func factorial(_ n: Int) -> Double {
+        return n == 0 ? 1.0 : Double(n) * factorial(n - 1)
     }
 }

@@ -17,6 +17,14 @@ MathSupport SPM is designed to streamline and enhance mathematical workflows. Th
 
 ## Topics
 
-### <!--@START_MENU_TOKEN@-->Group<!--@END_MENU_TOKEN@-->
+### LaTeX
 
-- <!--@START_MENU_TOKEN@-->``Symbol``<!--@END_MENU_TOKEN@-->
+- <doc:LaTeX>
+
+### Complex
+
+### Random
+
+- <doc:MarkovChain>
+- <doc:MersenneTwister>
+- <doc:Random>
