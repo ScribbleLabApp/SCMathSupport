@@ -26,6 +26,8 @@
 //
 
 import SwiftUI
+import MathJaxSwift
+//import HTMLEntities
 
 /// A view that can parse and render TeX and LaTeX equations that contain
 /// math-mode marcos.
@@ -33,7 +35,7 @@ import SwiftUI
 /// @Beta
 /// - Note: This function is currently in beta
 @available(iOS 18.0, *)
-public struct Math {
+public struct Math: View {
     
     /// A closure that takes an equation number and returns a string to display in
     /// the view.
@@ -119,4 +121,58 @@ public struct Math {
         Cache.shared.imageCache
     }
 #endif
+    
+    /// The view's LaTeX input string.
+    public let latex: String
+    
+//    /// What to do in the case of an error.
+//    @Environment(\.errorMode) private var errorMode
+//    
+//    /// Whether or not we should unencode the input.
+//    @Environment(\.unencodeHTML) private var unencodeHTML
+//    
+//    /// Should the view parse the entire input string or only equations?
+//    @Environment(\.parsingMode) private var parsingMode
+//    
+//    /// The view's block rendering mode.
+//    @Environment(\.blockMode) private var blockMode
+//    
+//    /// Whether the view should process escapes.
+//    @Environment(\.processEscapes) private var processEscapes
+//    
+//    /// The view's rendering style.
+//    @Environment(\.renderingStyle) private var renderingStyle
+//    
+//    /// The animation the view should apply to its rendered images.
+//    @Environment(\.renderingAnimation) private var renderingAnimation
+    
+    /// The view's current display scale.
+    @Environment(\.displayScale) private var displayScale
+    
+    /// The view's font.
+    @Environment(\.font) private var font
+    
+    /// The view's renderer.
+    @StateObject private var renderer = Renderer()
+    
+    /// The view's preload task, if any.
+    @State private var preloadTask: Task<(), Never>?
+    
+    /// Initializes a view with a LaTeX input string.
+    ///
+    /// - Parameter latex: The LaTeX input.
+    public init(_ latex: String) {
+        self.latex = latex
+    }
+    
+    public var body: some View {
+        Text("")
+    }
+}
+
+extension Math {
+    
+    private func isCached() -> Bool {
+        return true
+    }
 }
