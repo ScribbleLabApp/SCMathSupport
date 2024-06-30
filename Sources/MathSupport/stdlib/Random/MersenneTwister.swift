@@ -25,90 +25,92 @@
 
 import Foundation
 
-/// A high-quality random number generator using the Mersenne Twister algorithm.
-///
-/// The Mersenne Twister is a pseudorandom number generator (PRNG) known for its long period and high-quality randomness.
-/// This implementation supports seeding and generating random 32-bit unsigned integers.
-///
-/// - Note: This class is available on iOS 18.0 and later.
-@available(iOS 18.0, *)
-public class MersenneTwister {
-    /// The size of the state vector.
-    private static let n = 624
-
-    /// The period parameter.
-    private static let m = 397
-
-    /// A constant vector a.
-    private static let matrixA: UInt32 = 0x9908b0df
-
-    /// Most significant w-r bits.
-    private static let upperMask: UInt32 = 0x80000000
-
-    /// Least significant r bits.
-    private static let lowerMask: UInt32 = 0x7fffffff
-
-    /// The state vector.
-    private var mt = [UInt32](repeating: 0, count: n)
-
-    /// The index for the state vector.
-    private var index = n + 1
-
-    /// Initializes a new instance of the Mersenne Twister with the given seed.
+public extension Random {
+    /// A high-quality random number generator using the Mersenne Twister algorithm.
     ///
-    /// - Parameter seed: The initial seed value to initialize the generator.
-    public init(seed: UInt32) {
-        self.seed(seed)
-    }
-
-    /// Seeds the Mersenne Twister with the given value.
+    /// The Mersenne Twister is a pseudorandom number generator (PRNG) known for its long period and high-quality randomness.
+    /// This implementation supports seeding and generating random 32-bit unsigned integers.
     ///
-    /// - Parameter seed: The seed value to initialize the generator.
-    public func seed(_ seed: UInt32) {
-        mt[0] = seed
-
-        for i in 1..<MersenneTwister.n {
-            mt[i] = 1812433253 &* (mt[i - 1] ^ (mt[i - 1] >> 30)) &+ UInt32(i)
+    /// - Note: This class is available on iOS 18.0 and later.
+    @available(iOS 18.0, *)
+    class MersenneTwister {
+        /// The size of the state vector.
+        private static let n = 624
+        
+        /// The period parameter.
+        private static let m = 397
+        
+        /// A constant vector a.
+        private static let matrixA: UInt32 = 0x9908b0df
+        
+        /// Most significant w-r bits.
+        private static let upperMask: UInt32 = 0x80000000
+        
+        /// Least significant r bits.
+        private static let lowerMask: UInt32 = 0x7fffffff
+        
+        /// The state vector.
+        private var mt = [UInt32](repeating: 0, count: n)
+        
+        /// The index for the state vector.
+        private var index = n + 1
+        
+        /// Initializes a new instance of the Mersenne Twister with the given seed.
+        ///
+        /// - Parameter seed: The initial seed value to initialize the generator.
+        public init(seed: UInt32) {
+            self.seed(seed)
         }
-
-        index = MersenneTwister.n
-    }
-
-    /// Generates the next random 32-bit unsigned integer.
-    ///
-    /// - Returns: A pseudorandom 32-bit unsigned integer.
-    public func nextUInt32() -> UInt32 {
-        if index >= MersenneTwister.n {
-            twist()
-        }
-
-        var y = mt[index]
-        y ^= (y >> 11)
-        y ^= (y << 7) & 0x9d2c5680
-        y ^= (y << 15) & 0xefc60000
-        y ^= (y >> 18)
-
-        index += 1
-        return y
-    }
-
-    /// Performs the twist transformation to generate new random values.
-    ///
-    /// This method is called automatically when more random numbers are needed.
-    private func twist() {
-        let n = MersenneTwister.n
-        let m = MersenneTwister.m
-        let matrixA = MersenneTwister.matrixA
-        let upperMask = MersenneTwister.upperMask
-        let lowerMask = MersenneTwister.lowerMask
-
-        for i in 0..<n {
-            let y = (mt[i] & upperMask) | (mt[(i + 1) % n] & lowerMask)
-            mt[i] = mt[(i + m) % n] ^ (y >> 1)
-            if y % 2 != 0 {
-                mt[i] ^= matrixA
+        
+        /// Seeds the Mersenne Twister with the given value.
+        ///
+        /// - Parameter seed: The seed value to initialize the generator.
+        public func seed(_ seed: UInt32) {
+            mt[0] = seed
+            
+            for i in 1..<MersenneTwister.n {
+                mt[i] = 1812433253 &* (mt[i - 1] ^ (mt[i - 1] >> 30)) &+ UInt32(i)
             }
+            
+            index = MersenneTwister.n
         }
-        index = 0
+        
+        /// Generates the next random 32-bit unsigned integer.
+        ///
+        /// - Returns: A pseudorandom 32-bit unsigned integer.
+        public func nextUInt32() -> UInt32 {
+            if index >= MersenneTwister.n {
+                twist()
+            }
+            
+            var y = mt[index]
+            y ^= (y >> 11)
+            y ^= (y << 7) & 0x9d2c5680
+            y ^= (y << 15) & 0xefc60000
+            y ^= (y >> 18)
+            
+            index += 1
+            return y
+        }
+        
+        /// Performs the twist transformation to generate new random values.
+        ///
+        /// This method is called automatically when more random numbers are needed.
+        private func twist() {
+            let n = MersenneTwister.n
+            let m = MersenneTwister.m
+            let matrixA = MersenneTwister.matrixA
+            let upperMask = MersenneTwister.upperMask
+            let lowerMask = MersenneTwister.lowerMask
+            
+            for i in 0..<n {
+                let y = (mt[i] & upperMask) | (mt[(i + 1) % n] & lowerMask)
+                mt[i] = mt[(i + m) % n] ^ (y >> 1)
+                if y % 2 != 0 {
+                    mt[i] ^= matrixA
+                }
+            }
+            index = 0
+        }
     }
 }

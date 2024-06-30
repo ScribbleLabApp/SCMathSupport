@@ -25,17 +25,19 @@
 
 import Foundation
 
-public func monteCarloPiSimulation(iterations: Int) -> Double {
-    let rng = MersenneTwister(seed: UInt32(time(nil)))
-    var insideCircle = 0
-
-    for _ in 0..<iterations {
-        let x = Double(rng.nextUInt32()) / Double(UInt32.max)
-        let y = Double(rng.nextUInt32()) / Double(UInt32.max)
-        if x * x + y * y <= 1.0 {
-            insideCircle += 1
+public extension Random {
+    public func monteCarloPiSimulation(iterations: Int) -> Double {
+        let rng = MersenneTwister(seed: UInt32(time(nil)))
+        var insideCircle = 0
+        
+        for _ in 0..<iterations {
+            let x = Double(rng.nextUInt32()) / Double(UInt32.max)
+            let y = Double(rng.nextUInt32()) / Double(UInt32.max)
+            if x * x + y * y <= 1.0 {
+                insideCircle += 1
+            }
         }
+        
+        return 4.0 * Double(insideCircle) / Double(iterations)
     }
-
-    return 4.0 * Double(insideCircle) / Double(iterations)
 }
