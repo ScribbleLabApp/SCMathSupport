@@ -8,6 +8,8 @@
 import Foundation
 import Darwin
 
+import Foundation
+
 /// Structure representing a complex number.
 public struct Complex {
     public var real: Double
@@ -86,8 +88,8 @@ public struct Complex {
     ///
     /// - Returns: Exponential of the complex number.
     public func exp() -> Complex {
-        let expReal = Darwin.exp(real) * Darwin.cos(imaginary)
-        let expImaginary = Darwin.exp(real) * Darwin.sin(imaginary)
+        let expReal = Foundation.exp(real) * cos(imaginary)
+        let expImaginary = Foundation.exp(real) * sin(imaginary)
         return Complex(real: expReal, imaginary: expImaginary)
     }
     
@@ -97,15 +99,15 @@ public struct Complex {
     public func log() -> Complex {
         let modulus = self.modulus()
         let phase = self.phase()
-        return Complex(real: Darwin.log(modulus), imaginary: phase)
+        return Complex(real: Foundation.log(modulus), imaginary: phase)
     }
     
     /// Computes the sine of a complex number.
     ///
     /// - Returns: Sine of the complex number.
     public func sin() -> Complex {
-        let sinReal = Darwin.sin(real) * cosh(imaginary)
-        let sinImaginary = Darwin.cos(real) * sinh(imaginary)
+        let sinReal = Foundation.sin(real) * cosh(imaginary)
+        let sinImaginary = Foundation.cos(real) * sinh(imaginary)
         return Complex(real: sinReal, imaginary: sinImaginary)
     }
     
@@ -113,37 +115,78 @@ public struct Complex {
     ///
     /// - Returns: Cosine of the complex number.
     public func cos() -> Complex {
-        let cosReal = Darwin.cos(real) * cosh(imaginary)
-        let cosImaginary = -Darwin.sin(real) * sinh(imaginary)
+        let cosReal = Foundation.cos(real) * cosh(imaginary)
+        let cosImaginary = -Foundation.sin(real) * sinh(imaginary)
         return Complex(real: cosReal, imaginary: cosImaginary)
     }
     
-    /// Computes the Fast Fourier Transform (FFT) of an array of complex numbers.
+    /// Computes the tangent of a complex number.
     ///
-    /// - Parameter x: Array of complex numbers.
-    /// - Returns: Array of complex numbers representing the FFT result.
-    public func fft(_ x: [Complex]) -> [Complex] {
-        let n = x.count
-        
-        // Base case for recursion
-        if n <= 1 {
-            return x
-        }
-        
-        // Split even and odd elements
-        let even = fft(x.enumerated().filter { $0.offset % 2 == 0 }.map { $0.element })
-        let odd = fft(x.enumerated().filter { $0.offset % 2 == 1 }.map { $0.element })
-        
-        // Combine the results
-        var combined = [Complex](repeating: Complex(real: 0.0, imaginary: 0.0), count: n)
-        for k in 0..<n/2 {
-            let t = odd[k] * Complex(real: Darwin.cos(-2.0 * Double.pi * Double(k) / Double(n)), imaginary: Darwin.sin(-2.0 * Double.pi * Double(k) / Double(n)))
-            combined[k] = even[k] + t
-            combined[k + n/2] = even[k] - t
-        }
-        
-        return combined
+    /// - Returns: Tangent of the complex number.
+    public func tan() -> Complex {
+        let sinPart = self.sin()
+        let cosPart = self.cos()
+        return sinPart / cosPart
     }
-
+    
+    /// Computes the arc sine of a complex number.
+    ///
+    /// - Returns: Arc sine of the complex number.
+    public func asin() -> Complex {
+        let i = Complex(real: 0.0, imaginary: 1.0)
+        let one = Complex(real: 1.0, imaginary: 0.0)
+        let term1 = (i * self) + ((one - (self * self)).sqrt())
+        return -i * (term1.log())
+    }
+    
+    /// Computes the arc cosine of a complex number.
+    ///
+    /// - Returns: Arc cosine of the complex number.
+    public func acos() -> Complex {
+        let i = Complex(real: 0.0, imaginary: 1.0)
+        let one = Complex(real: 1.0, imaginary: 0.0)
+        let term1 = self + (i * ((one - (self * self)).sqrt()))
+        return -i * (term1.log())
+    }
+    
+    /// Computes the arc tangent of a complex number.
+    ///
+    /// - Returns: Arc tangent of the complex number.
+    public func atan() -> Complex {
+        let i = Complex(real: 0.0, imaginary: 1.0)
+        let one = Complex(real: 1.0, imaginary: 0.0)
+        let term1 = (i + self) / (i - self)
+        return (i / 2.0) * term1.log()
+    }
+    
+    /// Computes the square root of a complex number.
+    ///
+    /// - Returns: Square root of the complex number.
+    public func sqrt() -> Complex {
+        let modulus = self.modulus()
+        let phase = self.phase() / 2.0
+        let real = sqrt(modulus) * cos(phase)
+        let imaginary = sqrt(modulus) * sin(phase)
+        return Complex(real: real, imaginary: imaginary)
+    }
 }
 
+/// Scalar multiplication
+///
+/// - Parameters:
+///   - lhs: Left-hand side complex number.
+///   - rhs: Scalar value.
+/// - Returns: Result of scalar multiplication.
+public func *(lhs: Complex, rhs: Double) -> Complex {
+    return Complex(real: lhs.real * rhs, imaginary: lhs.imaginary * rhs)
+}
+
+/// Scalar division
+///
+/// - Parameters:
+///   - lhs: Left-hand side complex number.
+///   - rhs: Scalar value.
+/// - Returns: Result of scalar division.
+public func /(lhs: Complex, rhs: Double) -> Complex {
+    return Complex(real: lhs.real / rhs, imaginary: lhs.imaginary / rhs)
+}
