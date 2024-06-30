@@ -29,7 +29,7 @@ public struct Complex {
     ///
     /// - Returns: The modulus (magnitude).
     public func modulus() -> Double {
-        return sqrt(real * real + imaginary * imaginary)
+        return Darwin.sqrt(real * real + imaginary * imaginary)
     }
     
     /// Computes the phase (argument) of the complex number.
@@ -88,8 +88,8 @@ public struct Complex {
     ///
     /// - Returns: Exponential of the complex number.
     public func exp() -> Complex {
-        let expReal = Foundation.exp(real) * cos(imaginary)
-        let expImaginary = Foundation.exp(real) * sin(imaginary)
+        let expReal = Foundation.exp(real) * Darwin.cos(imaginary)
+        let expImaginary = Foundation.exp(real) * Darwin.sin(imaginary)
         return Complex(real: expReal, imaginary: expImaginary)
     }
     
@@ -165,8 +165,8 @@ public struct Complex {
     public func sqrt() -> Complex {
         let modulus = self.modulus()
         let phase = self.phase() / 2.0
-        let real = sqrt(modulus) * cos(phase)
-        let imaginary = sqrt(modulus) * sin(phase)
+        let real = sqrt(modulus) * Darwin.cos(phase)
+        let imaginary = sqrt(modulus) * Darwin.sin(phase)
         return Complex(real: real, imaginary: imaginary)
     }
 }
